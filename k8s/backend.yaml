@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sga-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sga-backend
+  template:
+    metadata:
+      labels:
+        app: sga-backend
+    spec:
+      containers:
+      - name: backend
+        image: nataliacc08/sga-farmacia:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: database-url
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sga-backend
+spec:
+  selector:
+    app: sga-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
